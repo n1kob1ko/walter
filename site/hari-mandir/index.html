@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Hari Mandir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<style>
+/* Layout: Tempelraum bei Nacht. Links die Figur als Altarbild, rechts die Tafel der gewählten Station; darunter der Aufstieg 1–7. Bewusst nur dunkel, passend zum Bild. */
+:root {
+  --night: #0b0a0c;
+  --stone: #17151a;
+  --stone-2: #211e25;
+  --line: #34303a;
+  --ink: #ece6dc;
+  --ink-soft: #a9a196;
+  --gold: #d8b25e;
+  --gold-soft: rgba(216,178,94,.16);
+  --chakra: var(--gold);
+  --f-display: "Marcellus", "Cormorant", Georgia, serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--night); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+.brand { font-family: var(--f-display); font-size: clamp(30px, 5vw, 46px); letter-spacing: .04em; margin: 0; line-height: 1.1; text-wrap: balance; }
+.brand small { display: block; font-family: var(--f-body); font-size: 15px; letter-spacing: .02em; color: var(--ink-soft); margin-top: 6px; }
+.draft { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--gold); border: 1px solid var(--gold-soft); padding: 4px 10px; border-radius: 999px; }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 40px; margin-top: 28px; align-items: start; }
+@media (max-width: 860px) { .stage { grid-template-columns: 1fr; gap: 24px; } }
+
+.figure-col { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 860px) { .figure-col { position: static; } }
+.figure { position: relative; aspect-ratio: 2048 / 2045; max-width: 100%; border-radius: 6px; overflow: hidden; background: #000; }
+.figure img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: filter .5s ease; }
+.figure.nadi-on img { filter: brightness(.42) saturate(.6); }
+.figure svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.nadi-path { fill: none; stroke-width: .7; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity .3s; filter: drop-shadow(0 0 1.2px currentColor); }
+.nadi-path.on { opacity: 1; animation: rise 2.4s ease-out both; }
+@keyframes rise { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+.tattoo { mix-blend-mode: multiply; transition: opacity .5s; }
+.crown { opacity: .85; }
+.crown path { fill: rgba(74,52,40,.12); stroke: #4a3428; stroke-width: .075; stroke-linejoin: round; transition: stroke .3s, fill .3s; }
+.figure.nadi-on .tattoo { opacity: .3; }
+.figure:has(.crown.lit) .tattoo, .figure:has(.spot.cap:hover) .tattoo, .figure:has(.spot.cap:focus-visible) .tattoo { mix-blend-mode: normal; }
+.crown.lit, .figure:has(.spot.cap:hover) .crown, .figure:has(.spot.cap:focus-visible) .crown { opacity: 1; filter: drop-shadow(0 0 .9px #ffd978); }
+.crown.lit path, .figure:has(.spot.cap:hover) .crown path, .figure:has(.spot.cap:focus-visible) .crown path { stroke: #b07a12; fill: rgba(255,217,120,.35); }
+.spot.cap::after { display: none; }
+.sush-base { fill: none; stroke: #f2d488; stroke-width: .5; stroke-linecap: round; opacity: .8; filter: drop-shadow(0 0 1px #e9c46a); transition: opacity .3s; }
+.figure.nadi-on .sush-base { opacity: 0; }
+.spot { position: absolute; transform: translate(-50%, -50%); width: var(--s, 8%); aspect-ratio: 1; border-radius: 50%; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.spot::after { content: ""; position: absolute; inset: -8%; border-radius: 50%; border: 2px solid var(--c); opacity: 0; transform: scale(.85); transition: opacity .25s, transform .25s; box-shadow: 0 0 18px var(--c); }
+.spot:hover::after, .spot:focus-visible::after { opacity: .75; transform: scale(1); }
+.spot.active::after { opacity: 1; transform: scale(1); animation: pulse 2.6s ease-in-out infinite; }
+.spot:focus-visible { outline: none; }
+@keyframes pulse { 50% { box-shadow: 0 0 34px var(--c); } }
+
+.nadis { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center; }
+.nadis span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-right: 4px; }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--stone); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+.chip[aria-pressed="true"] { border-color: var(--c); background: var(--stone-2); }
+.chip:focus-visible, .step:focus-visible, .nav button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.panel { background: var(--stone); border: 1px solid var(--line); border-radius: 8px; padding: 26px clamp(18px, 3vw, 32px); min-width: 0; border-top: 3px solid var(--chakra); transition: border-color .4s; }
+.eyebrow { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--chakra); margin: 0 0 6px; filter: brightness(1.15); }
+.panel h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(26px, 3.4vw, 34px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.panel .alt { color: var(--ink-soft); margin: 4px 0 0; }
+.panel .lead { margin: 18px 0 0; max-width: 62ch; }
+dl.facts { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 0 18px; margin: 22px 0 0; }
+dl.facts dt { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); padding: 12px 0; border-top: 1px solid var(--line); }
+dl.facts dd { margin: 0; padding: 10px 0; border-top: 1px solid var(--line); min-width: 0; }
+dl.facts dd small { display: block; font-size: 13px; color: var(--ink-soft); }
+@media (max-width: 520px) { dl.facts { grid-template-columns: 1fr; } dl.facts dt { padding-bottom: 0; } dl.facts dd { border-top: 0; padding-top: 2px; } }
+.merit { margin-top: 22px; padding: 16px 18px; background: var(--stone-2); border-radius: 6px; }
+.merit h3 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--chakra); margin: 0 0 6px; font-weight: 600; filter: brightness(1.15); }
+.merit p { margin: 0; }
+ul.parts { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
+ul.parts li { background: var(--stone-2); border-radius: 6px; padding: 12px 16px; }
+ul.parts b { font-family: var(--f-display); font-weight: 400; font-size: 19px; color: var(--chakra); filter: brightness(1.15); }
+.todo { margin-top: 18px; padding: 14px 16px; border: 1px dashed var(--line); border-radius: 6px; color: var(--ink-soft); font-size: 15px; }
+
+.warn { margin-top: 22px; padding: 16px 18px; border-radius: 6px; background: rgba(255,75,62,.08); border: 1px solid rgba(255,75,62,.45); }
+.warn h3 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #ff7a6e; margin: 0 0 6px; font-weight: 600; }
+.warn p { margin: 0 0 12px; }
+.warn button { font: inherit; font-size: 14px; color: var(--ink); background: transparent; border: 1px solid #f0cf7c; border-radius: 6px; padding: 7px 14px; cursor: pointer; }
+.warn button:hover, .warn button:focus-visible { background: rgba(240,207,124,.12); outline: none; }
+.src { margin: 18px 0 0; font-size: 13px; color: var(--ink-soft); font-style: italic; }
+.more { margin: 20px 0 0; }
+.more a, .back { color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold-soft); padding-bottom: 2px; }
+.more a:hover, .back:hover, .more a:focus-visible, .back:focus-visible { border-bottom-color: var(--gold); outline: none; }
+.page { max-width: 760px; margin-top: 28px; --chakra: #2d9be8; }
+.page .back { display: inline-block; margin-bottom: 28px; font-size: 14px; }
+.page h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(30px, 4.6vw, 44px); line-height: 1.12; margin: 0; text-wrap: balance; }
+.page .lead { font-size: 19px; margin: 16px 0 0; max-width: 60ch; }
+.page h3 { font-family: var(--f-display); font-weight: 400; font-size: 22px; margin: 36px 0 0; }
+.slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+.slots .todo { margin-top: 0; }
+.slots b { color: var(--ink); font-weight: 600; }
+.nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.nav button { font: inherit; font-size: 14px; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+.nav button:hover { border-color: var(--gold); }
+.nav button:disabled { opacity: .35; cursor: default; border-color: var(--line); }
+
+.path { margin-top: 44px; }
+.path h2 { font-family: var(--f-display); font-weight: 400; font-size: 24px; margin: 0 0 4px; }
+.path p { color: var(--ink-soft); margin: 0 0 16px; max-width: 65ch; }
+.steps { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 760px) { .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.step { font: inherit; text-align: left; color: var(--ink); background: var(--stone); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; border-bottom: 3px solid var(--c); min-width: 0; }
+.step .n { font-family: var(--f-display); font-size: 20px; color: var(--c); line-height: 1.1; }
+.step .t { font-size: 13px; color: var(--ink-soft); overflow-wrap: anywhere; }
+.step.active { background: var(--stone-2); border-color: var(--c); }
+.step.seen .n::after { content: " ✓"; font-family: var(--f-body); font-size: 12px; color: var(--ink-soft); }
+
+footer.note { margin-top: 40px; font-size: 13px; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) { .nadi-path.on, .spot.active::after { animation: none; } .figure img, .spot::after { transition: none; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 class="brand">Hari Mandir<small>Das menschliche Kleid der Tempel Gottes</small></h1>
+    <span class="draft">Entwurf</span>
+  </header>
+
+  <div id="view-main">
+  <section class="stage">
+    <div class="figure-col">
+      <div class="figure" id="figure">
+        <img src="chakra-figur.webp" alt="Meditierende Figur mit den fünf physischen Chakras entlang der Wirbelsäule, den zwei spirituellen Zentren auf der Stirn und den Nadis Ida und Pingala, die sich um die Mitte winden.">
+        <svg class="tattoo" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <defs><clipPath id="skull"><circle cx="49.95" cy="14.5" r="6.15"/></clipPath></defs>
+          <g clip-path="url(#skull)"><g id="crown" class="crown" transform="translate(49.95 10.2) scale(1 .46)"></g></g>
+        </svg>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path class="sush-base" d="M50.3 82.5 L50.3 81 M50.3 73 L50.3 71.5 M50.3 63.3 L50.3 51.6 M50.3 43.2 L50.3 34.6 M50.3 26.2 L50.3 16.9"/>
+          <path id="p-sushumna" class="nadi-path" pathLength="1" stroke-dasharray="1" style="color:#e9c46a;stroke:#f2d488" d="M50.3 85.9 L50.3 16.9"/>
+          <path id="p-ida" class="nadi-path" pathLength="1" stroke-dasharray="1" style="color:#a9dcf0;stroke:#c8ecfa" d=""/>
+          <path id="p-pingala" class="nadi-path" pathLength="1" stroke-dasharray="1" style="color:#ff3b30;stroke:#ff5a4d" d=""/>
+        </svg>
+        <div id="spots"></div>
+      </div>
+      <div class="nadis" role="group" aria-label="Nadis einblenden">
+        <span>Nadis</span>
+        <button class="chip" data-nadi="ida" aria-pressed="false" style="--c:#bfe6f6"><i></i>Ida</button>
+        <button class="chip" data-nadi="pingala" aria-pressed="false" style="--c:#ff4b3e"><i></i>Pingala</button>
+        <button class="chip" data-nadi="sushumna" aria-pressed="false" style="--c:#f0cf7c"><i></i>Sushumna</button>
+      </div>
+    </div>
+
+    <article class="panel" id="panel" aria-live="polite"></article>
+  </section>
+
+  <section class="path">
+    <h2>Der Aufstieg</h2>
+    <p>Der Lernpfad führt von der Wurzel bis zur Stirn. Wähle eine Station im Bild oder hier unten. Später kann jede Station eine geführte Meditation, ein Hörbuch oder ein Flipbook bekommen.</p>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  </div>
+
+  <section class="page" id="view-gemuet" hidden>
+    <a class="back" href="#drittes-auge">← Zurück zu Hari Mandir</a>
+    <p class="eyebrow">Eigene Seite</p>
+    <h2>Wie besiegt man das Gemüt?</h2>
+    <p class="lead">Das dritte Auge wird erst geöffnet, wenn das Gemüt besiegt wurde.</p>
+    <h3>Das Gemüt (Antahkaran) und seine vier Teile</h3>
+    <ul class="parts" id="gemuet-parts"></ul>
+    <h3>Der Weg</h3>
+    <div class="todo">Hier erscheint dein Text zur Frage, wie das Gemüt besiegt wird.</div>
+    <div class="slots">
+      <div class="todo"><b>Geführte Meditation</b><br>Platz für eine Tonspur zum Anhören.</div>
+      <div class="todo"><b>Flipbook</b><br>Platz für ein Buch zum Blättern.</div>
+    </div>
+  </section>
+
+  <footer class="note">Entwurf zur Abstimmung. Texte von Niko. Die Nadi-Texte sind aus Nikos Stichpunkten formuliert. Im Bild steht der goldene Punkt für Agya, der silberne für Antahkaran und der blaue für das dritte Auge.</footer>
+</div>
+
+<script>
+const PATH_PINGALA="M48.40 20.90 L47.80 21.52 L47.00 22.10 L46.41 22.69 L45.95 23.28 L45.58 23.86 L45.24 24.45 L45.00 25.04 L44.75 25.62 L44.58 26.21 L44.41 26.80 L44.29 27.38 L44.19 27.97 L44.09 28.56 L44.02 29.14 L44.04 29.73 L44.02 30.32 L44.07 30.90 L44.12 31.49 L44.19 32.08 L44.29 32.67 L44.41 33.25 L44.58 33.84 L44.78 34.43 L45.00 35.01 L45.29 35.60 L45.58 36.19 L46.00 36.77 L46.46 37.36 L47.02 37.95 L47.83 38.53 L48.83 39.12 L51.73 39.71 L52.66 40.29 L53.25 40.88 L53.71 41.47 L54.10 42.05 L54.44 42.64 L54.74 43.23 L55.00 43.81 L55.20 44.40 L55.40 44.99 L55.57 45.57 L55.71 46.16 L55.83 46.75 L55.96 47.33 L56.05 47.92 L56.13 48.51 L56.18 49.10 L56.20 49.68 L56.25 50.27 L56.27 50.86 L56.27 51.44 L56.25 52.03 L56.20 52.62 L56.18 53.20 L56.10 53.79 L56.01 54.38 L55.93 54.96 L55.81 55.55 L55.71 56.14 L55.52 56.72 L55.35 57.31 L55.15 57.90 L54.91 58.48 L54.66 59.07 L54.37 59.66 L54.03 60.24 L53.61 60.83 L53.10 61.42 L52.47 62.00 L51.42 62.59 L48.19 63.18 L46.78 63.77 L45.87 64.35 L45.26 64.94 L44.85 65.53 L44.56 66.11 L44.41 66.70 L44.26 67.29 L44.21 67.87 L44.29 68.46 L44.43 69.05 L44.65 69.63 L44.97 70.22 L45.41 70.81 L46.07 71.39 L46.97 71.98 L48.07 72.57 L54.47 73.74 L55.20 74.33 L55.59 74.91 L55.83 75.50 L56.03 76.09 L56.13 76.67 L56.13 77.26 L56.03 77.85 L55.88 78.44 L55.59 79.02 L55.20 79.61 L54.69 80.20 L54.00 80.78 L52.88 81.37 L46.63 82.54 L45.78 83.13 L45.21 83.72 L44.80 84.30 L44.51 84.89 L44.34 85.48 L44.24 86.06 L44.24 86.65 L44.36 87.24 L44.58 87.82 L44.90 88.41 L45.34 89.00 L45.97 89.58 L46.95 90.17 L48.39 90.76 L50.30 92.20";
+const PATH_IDA="M51.60 20.90 L52.61 21.52 L53.42 22.10 L54.03 22.69 L54.49 23.28 L54.91 23.86 L55.22 24.45 L55.52 25.04 L55.71 25.62 L55.91 26.21 L56.08 26.80 L56.20 27.38 L56.32 27.97 L56.40 28.56 L56.47 29.14 L56.49 29.73 L56.47 30.32 L56.45 30.90 L56.37 31.49 L56.32 32.08 L56.23 32.67 L56.08 33.25 L55.91 33.84 L55.69 34.43 L55.49 35.01 L55.20 35.60 L54.88 36.19 L54.47 36.77 L53.98 37.36 L53.39 37.95 L52.56 38.53 L48.71 39.71 L47.80 40.29 L47.22 40.88 L46.73 41.47 L46.34 42.05 L46.02 42.64 L45.73 43.23 L45.51 43.81 L45.31 44.40 L45.09 44.99 L44.92 45.57 L44.80 46.16 L44.65 46.75 L44.53 47.33 L44.46 47.92 L44.38 48.51 L44.31 49.10 L44.29 49.68 L44.24 50.27 L44.24 50.86 L44.24 51.44 L44.21 52.03 L44.29 52.62 L44.34 53.20 L44.38 53.79 L44.43 54.38 L44.56 54.96 L44.65 55.55 L44.80 56.14 L44.95 56.72 L45.09 57.31 L45.31 57.90 L45.51 58.48 L45.78 59.07 L46.07 59.66 L46.36 60.24 L46.75 60.83 L47.24 61.42 L47.85 62.00 L48.49 62.59 L52.37 63.18 L53.76 63.77 L54.64 64.35 L55.20 64.94 L55.62 65.53 L55.88 66.11 L56.08 66.70 L56.13 67.29 L56.10 67.87 L55.98 68.46 L55.76 69.05 L55.40 69.63 L54.93 70.22 L54.25 70.81 L53.17 71.39 L51.59 71.98 L49.73 72.57 L47.78 73.15 L46.51 73.74 L45.70 74.33 L45.17 74.91 L44.80 75.50 L44.56 76.09 L44.38 76.67 L44.36 77.26 L44.43 77.85 L44.63 78.44 L44.90 79.02 L45.34 79.61 L45.95 80.20 L46.78 80.78 L47.97 81.37 L53.12 82.54 L54.25 83.13 L54.96 83.72 L55.44 84.30 L55.81 84.89 L56.01 85.48 L56.13 86.06 L56.10 86.65 L56.01 87.24 L55.83 87.82 L55.47 88.41 L54.96 89.00 L54.25 89.58 L53.20 90.17 L51.93 90.76 L50.30 92.20";
+
+document.getElementById('p-ida').setAttribute('d', PATH_IDA);
+document.getElementById('p-pingala').setAttribute('d', PATH_PINGALA);
+
+// Der 1000-blättrige Lotos als Tätowierung auf der Schädeldecke.
+// Eine Rosette von oben gesehen, flach gestaucht, weil der Scheitel vom Betrachter weg zeigt.
+(function () {
+  const NS = 'http://www.w3.org/2000/svg', g = document.getElementById('crown');
+  // [Anzahl, Wurzelradius, halbe Breite, Länge, Versatz in Grad]
+  [[28, 2.3, .3, 1.3, 0], [22, 1.55, .3, 1.15, 8], [16, .85, .28, 1, 0], [10, .2, .24, .8, 18]].forEach(([n, r, w, l, off]) => {
+    for (let i = 0; i < n; i++) {
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', `M0 0 C${-w} ${-l * .3} ${-w} ${-l * .72} 0 ${-l} C${w} ${-l * .72} ${w} ${-l * .3} 0 0Z`);
+      p.setAttribute('transform', `rotate(${(off + i * 360 / n).toFixed(2)}) translate(0 ${-r})`);
+      g.appendChild(p);
+    }
+  });
+})();
+
+const STATIONS = [
+  { id: 1, name: 'Guda oder Muladhara', place: 'Rektum – Steißbein', group: 'Physisches Chakra', c: '#f5c400', x: 50.3, y: 85.9, s: 8,
+    facts: [['Herrschende Gottheiten', 'Ganesha', 'Hindu u. Sufi'], ['Lotos', '4-blättrig, mit 4 Sanskrit-Silben'], ['Element', 'Erde'], ['Farbe', 'gelb'], ['Funktion', 'Reinigung des Körpers']],
+    merit: 'Befreit einen von allen Unzulänglichkeiten und verleiht die Fähigkeit der Levitation.' },
+  { id: 2, name: 'Indri oder Svadhishthana', place: 'Zeugungsorgan – Kreuzbein', group: 'Physisches Chakra', c: '#4cb6e3', x: 50.3, y: 77.1, s: 8,
+    facts: [['Herrschende Gottheiten', 'Brahma (Michael)'], ['Lotos', '6-blättrig, mit 6 Sanskrit-Silben'], ['Element', 'Wasser'], ['Farbe', 'blau'], ['Funktion', 'Erzeugung der Art']],
+    merit: 'Furchtlosigkeit, Freisein von allen Bindungen.' },
+  { id: 3, name: 'Nabhi oder Manipura', place: 'Nabel – Solarplexus', group: 'Physisches Chakra', c: '#e5489c', x: 50.4, y: 67.4, s: 8,
+    facts: [['Herrschende Gottheiten', 'Vishnu (Israel)'], ['Lotos', '8-blättrig, mit 8 Sanskrit-Silben'], ['Element', 'Feuer'], ['Farbe', 'rot'], ['Funktion', 'Erhaltung und Bewahrung der Art']],
+    merit: 'Herr allen Begehrens, heilt alle Krankheiten und Leiden. Seher von verborgenen Schätzen; befähigt, in andere Körper einzudringen.' },
+  { id: 4, name: 'Hirdey oder Anahata', place: 'Herz – Thymusdrüse', group: 'Physisches Chakra', c: '#bfe3f2', x: 50.3, y: 47.4, s: 8,
+    facts: [['Herrschende Gottheiten', 'Shiva (Gabriel)'], ['Lotos', '12-blättrig, mit 12 Sanskrit-Silben'], ['Element', 'Luft'], ['Farbe', 'bläulich-weiß (rauchig)'], ['Funktion', 'Auflösung, Verfall u. Tod der Art']],
+    merit: 'Vergangenheit, Gegenwart und Zukunft offenbaren all ihre Geheimnisse.' },
+  { id: 5, name: 'Kanth oder Vishuddha', place: 'Kehle – Schilddrüse', group: 'Physisches Chakra', c: '#f4f0ea', x: 50.3, y: 30.4, s: 8,
+    facts: [['Herrschende Gottheiten', 'Shakti (die große Mutter des Universums)'], ['Lotos', '16-blättrig, mit 16 Sanskrit-Silben'], ['Element', 'Äther (alles durchdringend)'], ['Farbe', 'weiß (fleckenlos)'], ['Funktion', 'Die alles kontrollierende Kraft durch die drei Regenten (wie oben erwähnt) mit ihren spezifischen Funktionen.']],
+    merit: 'Befähigt einen, ein Yogishwar zu werden, und Kenner der Veden und ein Leben von 1000 Jahren zu leben.' },
+  { id: 6, name: 'Antahkaran oder Gemüt', place: 'Auf der Stirn', group: 'Spirituelles Chakra', c: '#d9dde3', x: 51.8, y: 16.6, s: 3.2, facts: [['Lotos', 'Silberner Lotos mit 4 Blättern']],
+    lead: 'Antahkaran (wörtlich das „innere Organ“ oder „innere Instrument“) ist der übergeordnete Sanskrit-Begriff für das gesamte innere Gemüt. Im Surat Shabd Yoga (sowie im klassischen Yoga und Vedanta) beschreibt Antahkaran das komplette psychische System, das aus genau den vier zuvor genannten Teilen besteht:',
+    parts: [['Chit', 'Das Bewusstseinsfeld / Gedächtnis', 'Chit ist die Leinwand oder der Speicherort aller Eindrücke.'],
+            ['Manas', 'Die Denkfähigkeit', 'Manas ist die Instanz, die über die Eindrücke nachsinnt und Gedankenwellen formt.'],
+            ['Buddhi', 'Der Intellekt / Schiedsrichter', 'Buddhi ist die Fähigkeit des Schlussfolgerns und der Unterscheidung. Nachdem Manas die verschiedenen Optionen abgewogen hat, fungiert Buddhi als der „große Schiedsrichter“, der die endgültige Entscheidung trifft und versucht, die Probleme des Lebens zu lösen.'],
+            ['Ahankar', 'Das Ego', 'Ahankar ist die selbstbehauptende Fähigkeit. Dieser Aspekt identifiziert sich mit den Handlungen und verlangt nach Anerkennung.']] },
+  { id: 7, name: 'Agya oder Ajna', place: 'Hinter und zwischen den Augenbrauen', group: 'Spirituelles Chakra', c: '#f0a43a', x: 47.9, y: 16.6, s: 3.2,
+    facts: [['Lotos', 'Goldener Lotos mit 2 Blättern'], ['Herrschende Gottheiten', 'Atman, der entkörperte Geist, befreit von allen Gewändern.'], ['Element', 'Das aktive Lebensprinzip; die eigentliche Seele der Schöpfung.'], ['Farbe', 'Strahlung und Glanz in voller Pracht – unaussprechlich.'], ['Funktion', 'Alles in allem, allem innewohnend. Das Alpha und Omega von allem das ist, sichtbar und unsichtbar.']],
+    merit: 'Erweist die Gunst der höchstmöglichen Gabe; mit allen Kräften – beiden, natürlichen und übernatürlichen.' }
+];
+const EXTRA = [
+  { key: 'tausendblatt', name: 'Der 1000-blättrige Lotos', place: 'Auf der Schädeldecke', group: 'Im Bild', c: '#f3e3b0', x: 49.95, y: 10.2, s: 8, ar: 2.1,
+    text: ['Hier ist der höchste Punkt der astralen Ebene. Hier entspringt das Prana, die Gesamtheit aller Naturkräfte.', 'Hier endet der Kundalini-Yoga in einer Sackgasse. Weiter kann der Yogi nicht gehen. Will er in die kausale Welt, muss er Bunk Nal suchen, den gekrümmten Tunnel.'] },
+  { key: 'kundalini', name: 'Kundalini', place: 'An der Wurzel der Wirbelsäule', group: 'Im Bild', c: '#c58a3a', x: 50.3, y: 92.3, s: 3.6, text: 'Mit Pranayama-Atemtechniken kann die Schlangenkraft der Kundalini aufsteigen. Zu ihr gehören die beiden Nadis Ida und Pingala.', todo: 'Ein eigener Text zur eingerollten Schlange am Steißbein fehlt noch.' },
+  { key: 'drittes-auge', name: 'Das dritte Auge', place: 'An der Nasenwurzel · Brahmachendra', group: 'Im Bild', c: '#2d9be8', x: 49.9, y: 15.85, s: 3.2, text: 'Der blaue Punkt ist das dritte Auge. Es wird erst geöffnet, wenn das Gemüt besiegt wurde. Hier endet die Sushumna, der Königsweg.', link: true }
+];
+const NADI_WARN = 'Wer die linke oder rechte Nadi benutzt, wird vom Weg abkommen. Die meisten Yogis verlieren sich in den Siddhis und kommen vom Pfad der Gottsuche ab. Nur der Königsweg durch die Sushumna Nadi ist sicher.';
+const NADIS = {
+  ida: { name: 'Ida', alt: 'Mondkanal · endet am rechten Nasenloch', c: '#bfe6f6', lead: 'Ida und Pingala gehören zur Kundalini-Energie. Mit Pranayama-Atemtechniken kann die Schlangenkraft der Kundalini aufsteigen.', warn: true },
+  pingala: { name: 'Pingala', alt: 'Sonnenkanal · endet am linken Nasenloch', c: '#ff4b3e', lead: 'Ida und Pingala gehören zur Kundalini-Energie. Mit Pranayama-Atemtechniken kann die Schlangenkraft der Kundalini aufsteigen.', warn: true },
+  sushumna: { name: 'Sushumna', alt: 'Der Königsweg', c: '#f0cf7c', lead: 'Die Sushumna ist der Königsweg. Sie verläuft gerade durch die Wirbelsäule und endet am dritten Auge im Brahmachendra, an der Nasenwurzel. Nur der Weg durch die Sushumna Nadi ist sicher. Wer die linke oder rechte Nadi benutzt, verliert sich leicht in den Siddhis und kommt vom Pfad der Gottsuche ab.' }
+};
+
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+const panel = $('#panel'), figure = $('#figure');
+const seen = new Set();
+let current = null, nadiOn = null;
+
+function makeSpot(item, key) {
+  const b = document.createElement('button');
+  b.className = 'spot'; b.dataset.key = key;
+  b.style.cssText = `left:${item.x}%;top:${item.y}%;--s:${item.s}%;--c:${item.c};aspect-ratio:${item.ar || 1}`;
+  b.setAttribute('aria-label', item.name);
+  if (item.ar) b.classList.add('cap');
+  b.addEventListener('click', () => show(key));
+  $('#spots').appendChild(b);
+}
+STATIONS.forEach(s => makeSpot(s, 'station-' + s.id));
+EXTRA.forEach(e => makeSpot(e, e.key));
+
+STATIONS.forEach(s => {
+  const b = document.createElement('button');
+  b.className = 'step'; b.dataset.key = 'station-' + s.id; b.style.setProperty('--c', s.c);
+  b.innerHTML = `<span class="n">${s.id}</span><span class="t">${esc(s.name.split(' oder ')[1])}</span>`;
+  b.addEventListener('click', () => show('station-' + s.id));
+  $('#steps').appendChild(b);
+});
+
+document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
+  const k = ch.dataset.nadi;
+  setNadi(nadiOn === k ? null : k);
+  if (nadiOn) renderNadi(k);
+}));
+
+function setNadi(k) {
+  nadiOn = k;
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.nadi === k)));
+  ['ida', 'pingala', 'sushumna'].forEach(n => {
+    const p = document.getElementById('p-' + n);
+    p.classList.remove('on'); void p.getBoundingClientRect();
+    if (n === k) p.classList.add('on');
+  });
+  figure.classList.toggle('nadi-on', !!k);
+}
+
+function factsHTML(f) { return f ? `<dl class="facts">${f.map(([k, v, n]) => `<dt>${esc(k)}</dt><dd>${esc(v)}${n ? `<small>${esc(n)}</small>` : ''}</dd>`).join('')}</dl>` : ''; }
+
+function show(key) {
+  setNadi(null);
+  current = key;
+  const st = STATIONS.find(s => 'station-' + s.id === key);
+  const ex = EXTRA.find(e => e.key === key);
+  const it = st || ex;
+  panel.style.setProperty('--chakra', it.c);
+  document.getElementById('crown').classList.toggle('lit', key === 'tausendblatt');
+  if (st) {
+    seen.add(key);
+    panel.innerHTML = `
+      <p class="eyebrow">${st.id} · ${esc(st.group)}</p>
+      <h2>${esc(st.name)}</h2>
+      <p class="alt">${esc(st.place)}</p>
+      ${st.lead ? `<p class="lead">${esc(st.lead)}</p>` : ''}
+      ${st.parts ? `<ul class="parts">${st.parts.map(([n, t, d]) => `<li><b>${esc(n)}</b> · ${esc(t)}<br>${esc(d)}</li>`).join('')}</ul>` : ''}
+      ${factsHTML(st.facts)}
+      ${st.merit ? `<div class="merit"><h3>Verdienste aus der Meditation · laut der Überlieferung</h3><p>${esc(st.merit)}</p></div>` : ''}
+      ${st.id === 6 ? `<p class="more"><a href="#gemuet">Wie besiegt man das Gemüt? →</a></p>` : ''}
+      <div class="nav">
+        <button id="prev" ${st.id === 1 ? 'disabled' : ''}>← Station ${st.id - 1 || ''}</button>
+        <button id="next" ${st.id === 7 ? 'disabled' : ''}>Station ${st.id < 7 ? st.id + 1 : ''} →</button>
+      </div>`;
+    $('#prev').onclick = () => show('station-' + (st.id - 1));
+    $('#next').onclick = () => show('station-' + (st.id + 1));
+  } else {
+    panel.innerHTML = `<p class="eyebrow">${esc(ex.group)}</p><h2>${esc(ex.name)}</h2><p class="alt">${esc(ex.place)}</p>${ex.text ? [].concat(ex.text).map(t => `<p class="lead">${esc(t)}</p>`).join('') : ''}${ex.link ? `<p class="more"><a href="#gemuet">Wie besiegt man das Gemüt? →</a></p>` : ''}${ex.todo ? `<div class="todo">${esc(ex.todo)}</div>` : ''}`;
+  }
+  document.querySelectorAll('.spot, .step').forEach(el => {
+    el.classList.toggle('active', el.dataset.key === key);
+    el.classList.toggle('seen', seen.has(el.dataset.key) && el.dataset.key !== key);
+  });
+  try { history.replaceState(null, '', '#' + key); } catch (e) {}
+}
+
+function renderNadi(k) {
+  const n = NADIS[k];
+  current = null;
+  document.getElementById('crown').classList.remove('lit');
+  document.querySelectorAll('.spot, .step').forEach(el => el.classList.remove('active'));
+  panel.style.setProperty('--chakra', n.c);
+  panel.innerHTML = `<p class="eyebrow">Nadi</p><h2>${esc(n.name)}</h2><p class="alt">${esc(n.alt)}</p>
+    <p class="lead">${esc(n.lead)}</p>
+    ${n.warn ? `<div class="warn"><h3>Warnung</h3><p>${esc(NADI_WARN)}</p><button id="toSush">Zum Königsweg →</button></div>` : ''}
+    <p class="src">Entwurf aus deinen Stichpunkten formuliert, bitte prüfen.</p>`;
+  const t = $('#toSush'); if (t) t.onclick = () => { setNadi('sushumna'); renderNadi('sushumna'); };
+}
+
+const known = k => STATIONS.some(s => 'station-' + s.id === k) || EXTRA.some(e => e.key === k);
+const start = (location.hash || '').slice(1);
+show(known(start) ? start : 'station-1');
+if (start === 'gemuet') { try { history.replaceState(null, '', '#gemuet'); } catch (e) {} }
+$('#gemuet-parts').innerHTML = STATIONS[5].parts.map(([n, t, d]) => `<li><b>${esc(n)}</b> · ${esc(t)}<br>${esc(d)}</li>`).join('');
+function route() {
+  const h = (location.hash || '').slice(1), g = h === 'gemuet';
+  $('#view-main').hidden = g; $('#view-gemuet').hidden = !g;
+  if (g) window.scrollTo(0, 0);
+  else if (known(h) && h !== current) show(h);
+}
+window.addEventListener('hashchange', route); route();
+</script>
+</body>
+</html>
